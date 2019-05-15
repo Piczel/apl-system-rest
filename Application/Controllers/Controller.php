@@ -6,7 +6,7 @@ namespace Application\Controllers;
 use Application\Models\Responses\DefaultResponse;
 use Application\Util\Http\HttpStatus;
 
-abstract class Controller
+class Controller
 {
 
     public function __construct()
@@ -24,14 +24,14 @@ abstract class Controller
             $this->{$name}($url_params);
         } else
         {
-            $this->response(
+            $this->respond(
                 new DefaultResponse('Controller method not found'),
                 HttpStatus::NOT_FOUND
             );
         }
     }
 
-    protected function response(
+    public function respond(
         $response_object,
         int $http_status
     ) : void
