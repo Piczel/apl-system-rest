@@ -5,6 +5,8 @@ namespace Application\Services;
 
 use DateTime;
 use Application\Util\Database;
+use Application\Util\Exceptions\RequestException;
+use Application\Util\Http\HttpStatus;
 
 class PresenceService
 {
@@ -34,6 +36,8 @@ class PresenceService
         $connection = Database\Connection::get_instance();
 
         $students = $connection->query(
+
+// ==== SQL ====
 "SELECT
     COALESCE(mon.presenceType, '') AS 'mon',
     COALESCE(tue.presenceType, '') AS 'tue',
@@ -57,8 +61,9 @@ FROM company
     LEFT JOIN presence AS fri
         ON fri.date = ? AND fri.forStudentID = student.studentID
 WHERE company.companyID = ?
-    AND NOW() BETWEEN ap.start AND ap.end
-",
+    AND NOW() BETWEEN ap.start AND ap.end"
+// =============
+            ,
             [
                 $mon->format('Y-m-d'),
                 $tue->format('Y-m-d'),
@@ -75,5 +80,46 @@ WHERE company.companyID = ?
         ];
 
         return $students_response;
+    }
+
+    public function report_presence(
+        string $date,
+        string $type,
+        int $studentID,
+        int $companyID
+    ) : void
+    {
+        $connection = Database\Connection::get_instance();
+
+        if(!\in_array(
+            $type,
+            ['PRESENT', 'UNAPPROVED_LEAVE', 'APPROVED_LEAVE', 'ILL', '']
+        )) {
+            throw new RequestException('Invalid presence type', HttpStatus::BAD_REQUEST);
+        }
+
+        $connection->execute(
+
+// ==== SQL ====
+'REPLACE INTO presence (
+    forStudentID,
+    `date`,
+    presenceType
+) SELECT ?, ?, ? 
+WHERE (
+    SELECT 1 
+    FROM company
+        INNER JOIN student ON forCompanyID = companyID
+    WHERE companyID = ?
+) > 0'
+// =============
+            ,
+            [
+                $studentID,
+                $date,
+                $type,
+                $companyID
+            ]
+        );
     }
 }

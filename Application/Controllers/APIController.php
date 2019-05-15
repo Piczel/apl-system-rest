@@ -17,7 +17,8 @@ class APIController extends Controller
         parent::__construct();
     }
 
-    protected function secret() {
+    protected function secret()
+    {
 
         $company_name = Param::get('companyName');
         $password = Param::get('password');
@@ -32,7 +33,8 @@ class APIController extends Controller
         $this->respond($secret_response, HttpStatus::OK);
     }
 
-    protected function students() {
+    protected function students()
+    {
         
         $companyID = Param::get_int('companyID');
         $secret = Param::get('secret');
@@ -49,5 +51,33 @@ class APIController extends Controller
         $student_response = $presence_service->get_students($companyID);
 
         $this->respond($student_response, HttpStatus::OK);
+    }
+
+    protected function presence()
+    {
+
+        $companyID  = Param::get_int('companyID');
+        $secret     = Param::get('secret');
+        $date       = Param::get('date');
+        $type       = Param::get('type');
+        $studentID  = Param::get_int('studentID');
+
+        $authorization_service = new AuthorizationService;
+
+        if(!$authorization_service->authorize($companyID, $secret))
+        {
+            throw new RequestException('Invalid secret', HttpStatus::UNAUTHORIZED);
+        }
+
+        $presence_service = new PresenceService;
+
+        $presence_service->report_presence(
+            $date,
+            $type,
+            $studentID,
+            $companyID
+        );
+
+        $this->respond(new DefaultResponse("OK"), HttpStatus::OK);
     }
 }
