@@ -1,0 +1,9 @@
+Options +FollowSymLinks
+RewriteEngine On
+
+RewriteRule ^public/ - [L]
+
+RewriteCond %{REQUEST_URI} !-f
+RewriteCond %{REQUEST_URI} !-d
+RewriteCond %{REQUEST_URI} !-l
+RewriteRule ^(.*)$ index.php?route_url=$1 [QSA,L]
