@@ -47,4 +47,24 @@ class AuthorizationService
 
         return new SecretResponse($companyID, $secret);
     }
+
+    public function authorize(
+        int $companyID,
+        string $secret
+    ) : bool
+    {
+        $connection = Database\Connection::get_instance();
+
+        if($connection->count(
+            'SELECT 1 FROM company WHERE companyID = ? AND `secret` = ?',
+            [
+                $companyID,
+                $secret
+            ]
+        ) === 1) {
+            return true;
+        }
+
+        return false;
+    }
 }

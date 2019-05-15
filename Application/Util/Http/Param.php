@@ -18,4 +18,16 @@ class Param
 
         return $_GET[$name];
     }
+
+    public static function get_int(
+        string $name
+    ) : int
+    {
+        if(!isset($_GET[$name]))
+        {
+            throw new RequestException('Undefined parameter: '. $name, HttpStatus::BAD_REQUEST);
+        }
+
+        return \intval($_GET[$name]);
+    }
 }

@@ -6,6 +6,9 @@ namespace Application\Controllers;
 use Application\Services\AuthorizationService;
 use Application\Util\Http\HttpStatus;
 use Application\Util\Http\Param;
+use Application\Util\Exceptions\RequestException;
+use Application\Models\Responses\DefaultResponse;
+use Application\Services\PresenceService;
 
 class APIController extends Controller
 {
@@ -19,13 +22,32 @@ class APIController extends Controller
         $company_name = Param::get('companyName');
         $password = Param::get('password');
         
-        $api_service = new AuthorizationService;
+        $authorization_service = new AuthorizationService;
 
-        $secret_response = $api_service->generate_secret(
+        $secret_response = $authorization_service->generate_secret(
             $company_name,
             $password
         );
 
         $this->respond($secret_response, HttpStatus::OK);
+    }
+
+    protected function students() {
+        
+        $companyID = Param::get_int('companyID');
+        $secret = Param::get('secret');
+
+        $authorization_service = new AuthorizationService;
+
+        if(!$authorization_service->authorize($companyID, $secret))
+        {
+            throw new RequestException('Invalid secret', HttpStatus::UNAUTHORIZED);
+        }
+        
+        $presence_service = new PresenceService;
+
+        $student_response = $presence_service->get_students($companyID);
+
+        $this->respond($student_response, HttpStatus::OK);
     }
 }
