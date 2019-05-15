@@ -8,7 +8,7 @@ use Application\Util\Database;
 use Application\Util\Exceptions\RequestException;
 use Application\Util\Http\HttpStatus;
 
-class APIService
+class AuthorizationService
 {
     public function generate_secret(
         string $company_name,
