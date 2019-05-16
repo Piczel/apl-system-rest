@@ -38,13 +38,13 @@ class PresenceService
         $students = $connection->query(
 
 // ==== SQL ====
-"SELECT
-    COALESCE(mon.presenceType, '') AS 'mon',
-    COALESCE(tue.presenceType, '') AS 'tue',
-    COALESCE(wed.presenceType, '') AS 'wed',
-    COALESCE(thu.presenceType, '') AS 'thu',
-    COALESCE(fri.presenceType, '') AS 'fri',
-    student.studentID              AS 'studentID'
+'SELECT
+    COALESCE(mon.presenceType, "") AS "mon",
+    COALESCE(tue.presenceType, "") AS "tue",
+    COALESCE(wed.presenceType, "") AS "wed",
+    COALESCE(thu.presenceType, "") AS "thu",
+    COALESCE(fri.presenceType, "") AS "fri",
+    student.studentID              AS "studentID"
 FROM company
     INNER JOIN student
         ON student.forCompanyID = company.companyID
@@ -61,7 +61,7 @@ FROM company
     LEFT JOIN presence AS fri
         ON fri.date = ? AND fri.forStudentID = student.studentID
 WHERE company.companyID = ?
-    AND NOW() BETWEEN ap.start AND ap.end"
+    AND NOW() BETWEEN ap.start AND ap.end'
 // =============
             ,
             [
@@ -107,7 +107,7 @@ WHERE company.companyID = ?
     presenceType
 ) SELECT ?, ?, ? 
 WHERE (
-    SELECT 1 
+    SELECT COUNT(*) 
     FROM company
         INNER JOIN student ON forCompanyID = companyID
     WHERE companyID = ?
