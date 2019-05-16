@@ -2,6 +2,7 @@ Options +FollowSymLinks
 RewriteEngine On
 
 RewriteRule ^public/ - [L]
+RewriteRule ^tools/ - [L]
 
 RewriteCond %{REQUEST_URI} !-f
 RewriteCond %{REQUEST_URI} !-d

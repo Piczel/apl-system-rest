@@ -1,0 +1,191 @@
+openapi: 3.0.1
+info:
+  title: APL System
+  description: 'REST API for reporting presence/absence for students during internship'
+  contact:
+    email: eckerrot.samuel@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost/apl-system-rest/
+- url: http://localhost:8080/apl-system-rest/
+tags:
+- name: security
+- name: presence
+paths:
+  /api/secret:
+    get:
+      tags:
+      - security
+      summary: Generate a NEW secret token. This token won't expire
+      operationId: generateSecret
+      parameters:
+      - name: companyName
+        in: query
+        description: The company name (non case-sensitive)
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        description: The company's password
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Secret generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneratedSecret'
+        400:
+          description: Missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        401:
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+                
+  /api/students:
+    get:
+      tags:
+      - presence
+      summary: Retrieve a list of students for corresponding company
+      operationId: getStudents
+      parameters:
+      - name: companyID
+        in: query
+        description: Id of company retrieved from operation /api/secret
+        required: true
+        schema:
+          type: integer
+      - name: secret
+        in: query
+        description: Secret generated and retrieved from operation /api/secret
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Students retrieved
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/Students'
+        400:
+          description: Missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        401:
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+  /api/presence:
+    get:
+      tags:
+      - presence
+      summary: Updates students reported presence for a specific date
+      operationId: reportPresence
+      parameters:
+      - name: companyID
+        in: query
+        description: Id of company retrieved from operation /api/secret
+        required: true
+        schema:
+          type: integer
+      - name: secret
+        in: query
+        description: Secret generated and retrieved from operation /api/secret
+        required: true
+        schema:
+          type: string
+      - name: date
+        in: query
+        description: Date to report
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: type
+        in: query
+        description: Presence type
+        required: true
+        schema:
+          $ref: '#/components/schemas/PresenceType'
+      - name: studentID
+        in: query
+        description: ID of student, retrieved from /api/students
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Presence reported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        400:
+          description: Missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        401:
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+components:
+  schemas:
+    PresenceType:
+      type: string
+      enum:
+      - PRESENT
+      - APPROVED_LEAVE
+      - UNAPPROVED_LEAVE
+      - ILL
+      -
+    GeneratedSecret:
+      type: object
+      properties:
+        companyID:
+          type: integer
+        secret:
+          type: string
+    DefaultResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    Students:
+      type: object
+      properties:
+        mondayDate:
+          type: string
+          format: date
+        students:
+          type: array
+          items:
+            type: object
+            properties:
+              mon:
+                $ref: '#/components/schemas/PresenceType'
+              tue:
+                $ref: '#/components/schemas/PresenceType'
+              wed:
+                $ref: '#/components/schemas/PresenceType'
+              thu:
+                $ref: '#/components/schemas/PresenceType'
+              fri:
+                $ref: '#/components/schemas/PresenceType'
