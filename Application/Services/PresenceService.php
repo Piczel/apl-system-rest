@@ -39,12 +39,13 @@ class PresenceService
 
 // ==== SQL ====
 'SELECT
+    student.studentID              AS "studentID",
+    student.name                   AS "name",
     COALESCE(mon.presenceType, "") AS "mon",
     COALESCE(tue.presenceType, "") AS "tue",
     COALESCE(wed.presenceType, "") AS "wed",
     COALESCE(thu.presenceType, "") AS "thu",
-    COALESCE(fri.presenceType, "") AS "fri",
-    student.studentID              AS "studentID"
+    COALESCE(fri.presenceType, "") AS "fri"
 FROM company
     INNER JOIN student
         ON student.forCompanyID = company.companyID

@@ -179,6 +179,10 @@ components:
           items:
             type: object
             properties:
+              studentID:
+                type: integer
+              name:
+                type: string
               mon:
                 $ref: '#/components/schemas/PresenceType'
               tue:
