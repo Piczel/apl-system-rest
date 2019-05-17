@@ -8,26 +8,28 @@ use Application\Util\Exceptions\RequestException;
 class Param
 {
     public static function get(
-        string $name
-    ) : string
+        string $name,
+        bool $optional = false
+    ) : ?string
     {
-        if(!isset($_GET[$name]))
+        if(!isset($_GET[$name]) && !$optional)
         {
             throw new RequestException('Undefined parameter: '. $name, HttpStatus::BAD_REQUEST);
         }
 
-        return $_GET[$name];
+        return $_GET[$name] ?? null;
     }
 
     public static function get_int(
-        string $name
-    ) : int
+        string $name,
+        bool $optional = false
+    ) : ?int
     {
-        if(!isset($_GET[$name]))
+        if(!isset($_GET[$name]) && !$optional)
         {
             throw new RequestException('Undefined parameter: '. $name, HttpStatus::BAD_REQUEST);
         }
 
-        return \intval($_GET[$name]);
+        return ($_GET[$name] ?? null) == null ? null : \intval($_GET[$name]);
     }
 }
