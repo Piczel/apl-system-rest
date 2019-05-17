@@ -6,6 +6,7 @@ use Application\Controllers\Controller;
 use Application\Models\Responses\DefaultResponse;
 use Application\Util\Http\HttpStatus;
 use Application\Util\Exceptions\RequestException;
+use Application\Controllers\AdminController;
 
 // Register auto include function
 spl_autoload_register(function ($classname)
@@ -38,6 +39,10 @@ try
     {
         case 'api':
             $controller = new APIController;
+            $controller->method($method_name, $url_params);
+            break;
+        case 'admin':
+            $controller = new AdminController;
             $controller->method($method_name, $url_params);
             break;
     
